@@ -1,16 +1,19 @@
-# web_malware_scan.sh
+# Web hosting malware scan
 
-Portable bash script for a quick virus/malware check on a Linux web hosting
-server. Run it directly on the target host — it never SSHes anywhere itself.
+Two equivalent, portable scripts for a quick virus/malware check on a Linux
+web hosting server — a bash version (`web_malware_scan.sh`) and a Python 3
+stdlib-only version (`web_malware_scan.py`). Pick whichever fits your
+environment; both implement the same checks and CLI. Run either one directly
+on the target host — neither SSHes anywhere itself.
 
-## What it does
+## What they do
 
-1. **Discovers installed AV / rootkit tooling** instead of assuming one
+1. **Discover installed AV / rootkit tooling** instead of assuming one
    specific product is present: `clamscan`, `clamdscan`, `maldet`/`lmd`,
    `rkhunter`, `chkrootkit`, `lynis`, `aide`, `tripwire`, `ossec-control`.
-   With `--run-av`, it actually invokes whatever it found against the web
+   With `--run-av`, they actually invoke whatever was found against the web
    content roots.
-2. **Always runs a dependency-free heuristic sweep**, so the check still
+2. **Always run a dependency-free heuristic sweep**, so the check still
    works on boxes with no AV installed at all:
    - recently modified script files (`.php`, `.cgi`, `.pl`, `.py`, `.sh`)
    - known webshell / obfuscation signatures in PHP content
@@ -30,14 +33,21 @@ Web content roots are auto-detected from common hosting layouts
 ## Usage
 
 ```bash
+# bash
 ./web_malware_scan.sh                 # discovery + heuristic sweep (safe, read-only, fast)
 ./web_malware_scan.sh --run-av        # also run any AV/rootkit tools found, against web roots
 ./web_malware_scan.sh --days 7        # widen the "recently changed" window (default 3)
 ./web_malware_scan.sh --root /path    # add an extra web content root to scan
+
+# python (3.6+, no third-party dependencies)
+./web_malware_scan.py                 # same flags as above
+./web_malware_scan.py --run-av
+./web_malware_scan.py --days 7
+./web_malware_scan.py --root /path
 ```
 
 Some checks (cron inspection, full permission/process visibility) need root;
-the script warns and continues with what's available otherwise.
+both scripts warn and continue with what's available otherwise.
 
 ## Output
 
